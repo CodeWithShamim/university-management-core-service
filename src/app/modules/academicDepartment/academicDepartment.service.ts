@@ -13,6 +13,11 @@ const createAcademicDepartment = async (
 ): Promise<AcademicDepartment> => {
   const academicDepartment = await prisma.academicDepartment.create({
     data,
+    include: {
+      academicFaculty: true,
+      students: true,
+      faculties: true,
+    },
   });
   return academicDepartment;
 };
@@ -37,6 +42,11 @@ const getAllAcademicDepartment = async (
     orderBy: {
       [sortBy]: sortOrder,
     },
+    include: {
+      academicFaculty: true,
+      students: true,
+      faculties: true,
+    },
   });
 
   const total = await prisma.academicDepartment.count({
@@ -60,6 +70,11 @@ const getSingleAcademicDepartment = async (
     where: {
       id,
     },
+    include: {
+      academicFaculty: true,
+      students: true,
+      faculties: true,
+    },
   });
   return result;
 };
@@ -73,6 +88,11 @@ const updateAcademicDepartment = async (
       id,
     },
     data,
+    include: {
+      academicFaculty: true,
+      students: true,
+      faculties: true,
+    },
   });
   return result;
 };
@@ -83,6 +103,11 @@ const deleteAcademicDepartment = async (
   const result = await prisma.academicDepartment.delete({
     where: {
       id,
+    },
+    include: {
+      academicFaculty: true,
+      students: true,
+      faculties: true,
     },
   });
   return result;

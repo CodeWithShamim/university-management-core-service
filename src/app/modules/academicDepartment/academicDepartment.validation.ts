@@ -7,7 +7,7 @@ const create = z.object({
         required_error: 'Title is required.',
       })
       .nonempty(),
-    academicFaculty: z
+    academicFacultyId: z
       .string({
         required_error: 'Academic faculty is required.',
       })
@@ -18,7 +18,7 @@ const create = z.object({
 const update = z.object({
   body: z.object({
     title: z.string().optional(),
-    academicFaculty: z.string().optional(),
+    academicFacultyId: z.string().optional(),
   }),
 });
 
