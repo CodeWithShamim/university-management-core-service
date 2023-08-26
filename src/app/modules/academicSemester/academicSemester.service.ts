@@ -3,6 +3,7 @@ import { AcademicSemester } from '@prisma/client';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
+import handleFilters from '../../../shared/handleFilters';
 import prisma from '../../../shared/prisma';
 import { AcademicSemesterSearchableFields } from './academicSemester.constant';
 import { IFilters } from './academicSemester.interface';
@@ -21,31 +22,10 @@ const getAllAcademicSemester = async (
   options: IPaginationOptions
 ): Promise<IGenericResponse<AcademicSemester[]>> => {
   // <<---------------------------------------------->>
-  const { searchTerm, ...filtersData } = filters;
-  const andConditons = [];
-
-  if (searchTerm) {
-    andConditons.push({
-      OR: AcademicSemesterSearchableFields.map(field => ({
-        [field]: {
-          contains: searchTerm,
-          mode: 'insensitive',
-        },
-      })),
-    });
-  }
-
-  if (Object.keys(filtersData).length > 0) {
-    andConditons.push({
-      AND: Object.keys(filtersData).map(key => ({
-        [key]: {
-          equals: (filtersData as any)[key],
-        },
-      })),
-    });
-  }
-
-  const whereConditions = andConditons.length > 0 ? { AND: andConditons } : {};
+  const whereConditions = handleFilters(
+    filters,
+    AcademicSemesterSearchableFields
+  );
 
   const { page, limit, skip, sortBy, sortOrder } =
     paginationHelpers.calculatePagination(options);
