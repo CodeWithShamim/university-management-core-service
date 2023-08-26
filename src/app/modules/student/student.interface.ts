@@ -2,7 +2,7 @@ export type IFilters = {
   studentId?: string;
   firstName?: string;
   email?: string;
-  contactNo?: string;
+  contactNO?: string;
   gender?: string;
   bloodGroup?: string;
   searchTerm?: string;

@@ -6,58 +6,58 @@ const create = z.object({
       .string({
         required_error: 'Student id is required.',
       })
-      .optional(),
+      .nonempty(),
     profileImage: z
       .string({
         required_error: 'Profile image is required.',
       })
-      .optional(),
+      .nonempty(),
     firstName: z
       .string({
         required_error: 'First name is required.',
       })
-      .optional(),
+      .nonempty(),
     middleName: z.string().optional(),
     lastName: z
       .string({
         required_error: 'Last name is required.',
       })
-      .optional(),
+      .nonempty(),
     email: z
       .string({
         required_error: 'Email is required.',
       })
-      .optional(),
+      .nonempty(),
     contactNO: z
       .string({
         required_error: 'Contact number is required.',
       })
-      .optional(),
+      .nonempty(),
     gender: z
       .string({
         required_error: 'Gender is required.',
       })
-      .optional(),
+      .nonempty(),
     bloodGroup: z
       .string({
         required_error: 'Blood group is required.',
       })
-      .optional(),
+      .nonempty(),
     academicSemesterId: z
       .string({
         required_error: 'Academic semester id is required.',
       })
-      .optional(),
+      .nonempty(),
     academicDepartmentId: z
       .string({
         required_error: 'Academic department id is required.',
       })
-      .optional(),
+      .nonempty(),
     academicFacultyId: z
       .string({
         required_error: 'Academic faculty id is required.',
       })
-      .optional(),
+      .nonempty(),
   }),
 });
 
