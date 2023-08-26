@@ -1,3 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
-export default new PrismaClient();
+const prisma = new PrismaClient({
+  errorFormat: 'minimal',
+});
+
+export default prisma;
