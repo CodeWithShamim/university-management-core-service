@@ -18,11 +18,7 @@ router.get('/:id', StudentController.getSingleStudent);
 
 router.patch(
   '/:id',
-  auth(
-    ENUM_USER_ROLE.SUPER_ADMIN,
-    ENUM_USER_ROLE.ADMIN,
-    ENUM_USER_ROLE.STUDENT
-  ),
+  auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   validateRequest(StudentZodValidation.update),
   StudentController.updateStudent
 );
