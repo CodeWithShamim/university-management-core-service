@@ -64,6 +64,11 @@
             "date": 1693147417265,
             "name": "C:\\Users\\shami\\Downloads\\Project\\University Management Core Service\\logs\\winston\\errors\\UV-2023-27-08-20-error.log",
             "hash": "00c465acf923e89c83424ca0e73c38e0eb7a27689e09e8189d8b61d588b42531"
+        },
+        {
+            "date": 1693149062219,
+            "name": "C:\\Users\\shami\\Downloads\\Project\\University Management Core Service\\logs\\winston\\errors\\UV-2023-27-08-21-error.log",
+            "hash": "abce34dc2f2aa23ba4fa06ed7555f7fede946fd9b910041fe396276c8b35608d"
         }
     ],
     "hashType": "sha256"
