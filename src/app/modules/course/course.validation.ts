@@ -21,6 +21,7 @@ const create = z.object({
           courseId: z.string({
             required_error: 'CouresId is required',
           }),
+          isDeleted: z.boolean().optional(),
         })
       )
       .optional(),
@@ -36,6 +37,7 @@ const update = z.object({
       .array(
         z.object({
           courseId: z.string(),
+          isDeleted: z.boolean().optional(),
         })
       )
       .optional(),

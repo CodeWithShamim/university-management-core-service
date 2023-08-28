@@ -124,25 +124,86 @@ const getSingleCourse = async (id: string): Promise<Course | null> => {
 
 const updateCourse = async (
   id: string,
-  data: Partial<Course>
+  data: Partial<ICourse>
 ): Promise<Course> => {
-  const result = await prisma.course.update({
-    where: {
-      id,
-    },
-    data,
-    include: {
-      prerequisite: {
-        include: {
-          prerequisite: true,
+  const { preRequisiteCourses, ...courseData } = data;
+
+  const result = await prisma.$transaction(async tx => {
+    const result = await tx.course.update({
+      where: {
+        id,
+      },
+      data: courseData,
+      include: {
+        prerequisite: {
+          include: {
+            prerequisite: true,
+          },
+        },
+        prerequisiteFor: {
+          include: {
+            course: true,
+          },
         },
       },
-      prerequisiteFor: {
-        include: {
-          course: true,
-        },
-      },
-    },
+    });
+
+    if (!result) {
+      throw new ApiError(httpStatus.BAD_REQUEST, 'Unable to update course');
+    }
+
+    if (preRequisiteCourses && preRequisiteCourses.length > 0) {
+      // filter delete prequisite
+      const deletedRrerequisites = preRequisiteCourses.filter(
+        prerequisite => prerequisite.courseId && prerequisite.isDeleted
+      );
+
+      const newRrerequisites = preRequisiteCourses.filter(
+        prerequisite => prerequisite.courseId && !prerequisite.isDeleted
+      );
+
+      // console.log({ deletedRrerequisites });
+      // console.log({ newRrerequisites });
+
+      for (let i = 0; i < deletedRrerequisites.length; i++) {
+        const deleteOldRrerequisites = await tx.courseToPrerequisite.deleteMany(
+          {
+            where: {
+              AND: [
+                {
+                  courseId: id,
+                },
+                {
+                  prerequisiteId: deletedRrerequisites[i].courseId,
+                },
+              ],
+            },
+          }
+        );
+
+        console.log({ deleteOldRrerequisites });
+      }
+
+      try {
+        for (let i = 0; i < newRrerequisites.length; i++) {
+          const addedNewRrerequisites = await tx.courseToPrerequisite.create({
+            data: {
+              courseId: id,
+              prerequisiteId: newRrerequisites[i].courseId,
+            },
+          });
+
+          console.log({ addedNewRrerequisites });
+        }
+      } catch (error) {
+        throw new ApiError(
+          httpStatus.BAD_REQUEST,
+          'This coures & prerequisite already exists.'
+        );
+      }
+    }
+
+    return result;
   });
   return result;
 };
@@ -175,12 +236,16 @@ const deleteCourse = async (id: string): Promise<Course> => {
     // step-2
     if (findCourse.prerequisite.length > 0) {
       for (let i = 0; i < findCourse.prerequisite.length; i++) {
-        const delPrerequisite = await tx.courseToPrerequisite.delete({
+        const delPrerequisite = await tx.courseToPrerequisite.deleteMany({
           where: {
-            courseId_prerequisiteId: {
-              courseId: findCourse.prerequisite[i].courseId,
-              prerequisiteId: findCourse.prerequisite[i].prerequisiteId,
-            },
+            AND: [
+              {
+                courseId: id,
+              },
+              {
+                prerequisiteId: findCourse.prerequisite[i].prerequisiteId,
+              },
+            ],
           },
         });
 
