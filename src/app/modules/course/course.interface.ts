@@ -4,9 +4,14 @@ export type IFilters = {
   searchTerm?: string;
 };
 
+export type IPrerequisite = {
+  courseId: string;
+  isDeleted?: boolean;
+};
+
 export type ICourse = {
   title: string;
   code: string;
   credits: number;
-  preRequisiteCourses: { courseId: string; isDeleted?: boolean }[];
+  preRequisiteCourses: IPrerequisite[];
 };

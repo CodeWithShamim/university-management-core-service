@@ -7,8 +7,9 @@ import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import handleFilters from '../../../shared/handleFilters';
 import prisma from '../../../shared/prisma';
+import { asyncForEach } from '../../../shared/utils';
 import { CourseSearchableFields } from './course.constant';
-import { ICourse, IFilters } from './course.interface';
+import { ICourse, IFilters, IPrerequisite } from './course.interface';
 
 const createCourse = async (data: ICourse): Promise<any> => {
   const { preRequisiteCourses, ...courseData } = data;
@@ -23,15 +24,20 @@ const createCourse = async (data: ICourse): Promise<any> => {
     }
 
     if (preRequisiteCourses && preRequisiteCourses.length > 0) {
-      for (let i = 0; i < preRequisiteCourses.length; i++) {
-        const preCourse = await transactionClient.courseToPrerequisite.create({
-          data: {
-            courseId: course.id,
-            prerequisiteId: preRequisiteCourses[i].courseId,
-          },
-        });
-        console.log(preCourse, 'preCourse');
-      }
+      await asyncForEach(
+        preRequisiteCourses,
+        async (prerequisite: IPrerequisite) => {
+          const preCourse = await transactionClient.courseToPrerequisite.create(
+            {
+              data: {
+                courseId: course.id,
+                prerequisiteId: prerequisite.courseId,
+              },
+            }
+          );
+          console.log(preCourse, 'preCourse');
+        }
+      );
     }
 
     return course;
@@ -165,36 +171,41 @@ const updateCourse = async (
       // console.log({ deletedRrerequisites });
       // console.log({ newRrerequisites });
 
-      for (let i = 0; i < deletedRrerequisites.length; i++) {
-        const deleteOldRrerequisites = await tx.courseToPrerequisite.deleteMany(
-          {
-            where: {
-              AND: [
-                {
-                  courseId: id,
-                },
-                {
-                  prerequisiteId: deletedRrerequisites[i].courseId,
-                },
-              ],
-            },
-          }
-        );
+      await asyncForEach(
+        deletedRrerequisites,
+        async (prerequisite: IPrerequisite) => {
+          const deleteOldRrerequisites =
+            await tx.courseToPrerequisite.deleteMany({
+              where: {
+                AND: [
+                  {
+                    courseId: id,
+                  },
+                  {
+                    prerequisiteId: prerequisite.courseId,
+                  },
+                ],
+              },
+            });
 
-        console.log({ deleteOldRrerequisites });
-      }
+          console.log({ deleteOldRrerequisites });
+        }
+      );
 
       try {
-        for (let i = 0; i < newRrerequisites.length; i++) {
-          const addedNewRrerequisites = await tx.courseToPrerequisite.create({
-            data: {
-              courseId: id,
-              prerequisiteId: newRrerequisites[i].courseId,
-            },
-          });
+        await asyncForEach(
+          newRrerequisites,
+          async (prerequisite: IPrerequisite) => {
+            const addedNewRrerequisites = await tx.courseToPrerequisite.create({
+              data: {
+                courseId: id,
+                prerequisiteId: prerequisite.courseId,
+              },
+            });
 
-          console.log({ addedNewRrerequisites });
-        }
+            console.log({ addedNewRrerequisites });
+          }
+        );
       } catch (error) {
         throw new ApiError(
           httpStatus.BAD_REQUEST,
@@ -235,7 +246,7 @@ const deleteCourse = async (id: string): Promise<Course> => {
 
     // step-2
     if (findCourse.prerequisite.length > 0) {
-      for (let i = 0; i < findCourse.prerequisite.length; i++) {
+      await asyncForEach(findCourse.prerequisite, async (prerequisite: any) => {
         const delPrerequisite = await tx.courseToPrerequisite.deleteMany({
           where: {
             AND: [
@@ -243,14 +254,14 @@ const deleteCourse = async (id: string): Promise<Course> => {
                 courseId: id,
               },
               {
-                prerequisiteId: findCourse.prerequisite[i].prerequisiteId,
+                prerequisiteId: prerequisite.prerequisiteId,
               },
             ],
           },
         });
 
         console.log({ delPrerequisite });
-      }
+      });
     }
 
     // step-3
