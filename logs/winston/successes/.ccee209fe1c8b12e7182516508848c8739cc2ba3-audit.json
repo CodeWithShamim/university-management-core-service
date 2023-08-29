@@ -104,6 +104,21 @@
             "date": 1693214844637,
             "name": "C:\\Users\\shami\\Downloads\\Project\\University Management Core Service\\logs\\winston\\successes\\UV-2023-28-08-15-success.log",
             "hash": "fad58f77d3a397b12078291dbcca0350fe2c7d76394bb5d128718572a583a658"
+        },
+        {
+            "date": 1693312274438,
+            "name": "C:\\Users\\shami\\Downloads\\Project\\University Management Core Service\\logs\\winston\\successes\\UV-2023-29-08-18-success.log",
+            "hash": "1856574af9943c508b4ce72ac5d54bd7622ef893c62da4be82280e473dd620f6"
+        },
+        {
+            "date": 1693315174226,
+            "name": "C:\\Users\\shami\\Downloads\\Project\\University Management Core Service\\logs\\winston\\successes\\UV-2023-29-08-19-success.log",
+            "hash": "1c329d0d8c3eabb9fff38bfdda9326f6826615be6caa08f1a9299b263f3594f4"
+        },
+        {
+            "date": 1693321456150,
+            "name": "C:\\Users\\shami\\Downloads\\Project\\University Management Core Service\\logs\\winston\\successes\\UV-2023-29-08-21-success.log",
+            "hash": "2360a1c42f7bf3c2647eff7ced427d4a99b8b568c2b3a79bdef02e6cf3be4863"
         }
     ],
     "hashType": "sha256"
