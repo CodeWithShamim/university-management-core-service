@@ -119,6 +119,11 @@
             "date": 1693321456150,
             "name": "C:\\Users\\shami\\Downloads\\Project\\University Management Core Service\\logs\\winston\\successes\\UV-2023-29-08-21-success.log",
             "hash": "2360a1c42f7bf3c2647eff7ced427d4a99b8b568c2b3a79bdef02e6cf3be4863"
+        },
+        {
+            "date": 1693329474374,
+            "name": "C:\\Users\\shami\\Downloads\\Project\\University Management Core Service\\logs\\winston\\successes\\UV-2023-29-08-23-success.log",
+            "hash": "1b53f2218b5822ed2b3030d0827a2d98e1314ba0841a8d83e12495f21f428d15"
         }
     ],
     "hashType": "sha256"
