@@ -1,10 +1,37 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { SemesterRegistration } from '@prisma/client';
+import {
+  SemesterRegistration,
+  SemesterRegistrationStatus,
+} from '@prisma/client';
+import httpStatus from 'http-status';
+import ApiError from '../../../errors/ApiError';
 import prisma from '../../../shared/prisma';
 
 const createSemesterRegistration = async (
   data: SemesterRegistration
 ): Promise<SemesterRegistration> => {
+  // ==================
+  const findUpcomingOrOngoingSemeserRegistration =
+    await prisma.semesterRegistration.findFirst({
+      where: {
+        OR: [
+          {
+            status: SemesterRegistrationStatus.UPCOMING,
+          },
+          {
+            status: SemesterRegistrationStatus.ONGOING,
+          },
+        ],
+      },
+    });
+
+  if (findUpcomingOrOngoingSemeserRegistration) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      `There is aready an ${findUpcomingOrOngoingSemeserRegistration.status} registration`
+    );
+  }
+
   const SemesterRegistration = await prisma.semesterRegistration.create({
     data,
     include: {

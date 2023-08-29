@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { SemesterRegistrationStatus } from '@prisma/client';
 import { z } from 'zod';
 
 const create = z.object({
@@ -12,11 +14,12 @@ const create = z.object({
         required_error: 'End date is required.',
       })
       .nonempty(),
-    status: z
-      .string({
+    status: z.enum(
+      [...Object.values(SemesterRegistrationStatus)] as [string, ...string[]],
+      {
         required_error: 'Status is required.',
-      })
-      .nonempty(),
+      }
+    ),
     minCredit: z.number({
       required_error: 'Min credit is required.',
     }),
@@ -35,7 +38,12 @@ const update = z.object({
   body: z.object({
     startDate: z.string().optional(),
     endDate: z.string().optional(),
-    status: z.string().optional(),
+    status: z
+      .enum(
+        [...Object.values(SemesterRegistrationStatus)] as [string, ...string[]],
+        {}
+      )
+      .optional(),
     minCredit: z.number().optional(),
     maxCredit: z.number().optional(),
     academicSemesterId: z.string().optional(),
