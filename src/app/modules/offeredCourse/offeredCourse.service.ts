@@ -1,19 +1,50 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { OfferedCourse } from '@prisma/client';
+import httpStatus from 'http-status';
+import ApiError from '../../../errors/ApiError';
 import prisma from '../../../shared/prisma';
+import { asyncForEach } from '../../../shared/utils';
+import { IOfferedCourse } from './offeredCourse.interface';
 
 const createOfferedCourse = async (
-  data: OfferedCourse
+  data: IOfferedCourse
 ): Promise<OfferedCourse> => {
-  const OfferedCourse = await prisma.offeredCourse.create({
-    data,
-    include: {
-      course: true,
-      semesterRegistration: true,
-      academicDepartment: true,
-    },
+  const { courseIds, semesterRegistrationId, academicDepartmentId } = data;
+
+  const result: any = [];
+  await asyncForEach(courseIds, async (courseId: string) => {
+    const alreadyExist = await prisma.offeredCourse.findFirst({
+      where: {
+        courseId,
+        semesterRegistrationId,
+        academicDepartmentId,
+      },
+    });
+
+    if (alreadyExist) {
+      throw new ApiError(
+        httpStatus.BAD_REQUEST,
+        'This offeredcoure data already exist!'
+      );
+    }
+
+    const OfferedCourse = await prisma.offeredCourse.create({
+      data: {
+        courseId: courseId,
+        semesterRegistrationId: semesterRegistrationId,
+        academicDepartmentId: academicDepartmentId,
+      },
+      include: {
+        course: true,
+        semesterRegistration: true,
+        academicDepartment: true,
+      },
+    });
+
+    result.push(OfferedCourse);
   });
-  return OfferedCourse;
+
+  return result;
 };
 
 const getAllOfferedCourse = async (): Promise<OfferedCourse[]> => {
