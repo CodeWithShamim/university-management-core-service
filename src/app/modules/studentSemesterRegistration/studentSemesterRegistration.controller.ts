@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { StudentSemesterRegistration } from '@prisma/client';
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
@@ -10,10 +11,10 @@ import { StudentSemesterRegistrationService } from './studentSemesterRegistratio
 
 const createStudentSemesterRegistration = catchAsync(
   async (req: Request, res: Response) => {
-    const data = req.body;
+    const { userId: authUserId } = req.user as any;
     const result =
       await StudentSemesterRegistrationService.createStudentSemesterRegistration(
-        data
+        authUserId
       );
 
     sendResponse<StudentSemesterRegistration>(res, {

@@ -247,8 +247,8 @@ enum WeekDays {
 
 model StudentSemesterRegistration {
   id                String   @id @default(uuid())
-  isConfirmed       Boolean  @default(false)
-  totalCreditsTaken Int      @default(0)
+  isConfirmed       Boolean? @default(false)
+  totalCreditsTaken Int?     @default(0)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

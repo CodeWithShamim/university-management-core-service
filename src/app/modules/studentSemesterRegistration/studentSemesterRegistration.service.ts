@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { StudentSemesterRegistration } from '@prisma/client';
+import {
+  SemesterRegistrationStatus,
+  StudentSemesterRegistration,
+} from '@prisma/client';
 import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
@@ -11,13 +14,47 @@ import { StudentSemesterRegistrationSearchableFields } from './studentSemesterRe
 import { IFilters } from './studentSemesterRegistration.interface';
 
 const createStudentSemesterRegistration = async (
-  data: StudentSemesterRegistration
+  authUserId: string
 ): Promise<StudentSemesterRegistration> => {
+  const studentInfo = await prisma.student.findFirst({
+    where: {
+      studentId: authUserId,
+    },
+  });
+
+  if (!studentInfo) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'Student information not found!'
+    );
+  }
+
+  const semesterRegistrationInfo = await prisma.semesterRegistration.findFirst({
+    where: {
+      status: {
+        in: [
+          SemesterRegistrationStatus.ONGOING,
+          SemesterRegistrationStatus.UPCOMING,
+        ],
+      },
+    },
+  });
+
+  if (
+    !semesterRegistrationInfo ||
+    semesterRegistrationInfo?.status === SemesterRegistrationStatus.UPCOMING
+  ) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'Registration is not started yet!'
+    );
+  }
+
   const isExistRegistration =
     await prisma.studentSemesterRegistration.findFirst({
       where: {
-        semesterRegistrationId: data.semesterRegistrationId,
-        studentId: data.studentId,
+        semesterRegistrationId: semesterRegistrationInfo.id,
+        studentId: studentInfo.id,
       },
     });
 
@@ -30,7 +67,18 @@ const createStudentSemesterRegistration = async (
 
   const StudentSemesterRegistration =
     await prisma.studentSemesterRegistration.create({
-      data,
+      data: {
+        student: {
+          connect: {
+            id: studentInfo.id,
+          },
+        },
+        semesterRegistration: {
+          connect: {
+            id: semesterRegistrationInfo.id,
+          },
+        },
+      },
       include: {
         semesterRegistration: true,
         student: true,
