@@ -21,28 +21,30 @@ const createOfferedCourse = async (
       },
     });
 
-    if (alreadyExist) {
-      throw new ApiError(
-        httpStatus.BAD_REQUEST,
-        'This offeredcoure data already exist!'
-      );
+    if (!alreadyExist) {
+      const OfferedCourse = await prisma.offeredCourse.create({
+        data: {
+          courseId: courseId,
+          semesterRegistrationId: semesterRegistrationId,
+          academicDepartmentId: academicDepartmentId,
+        },
+        include: {
+          course: true,
+          semesterRegistration: true,
+          academicDepartment: true,
+        },
+      });
+
+      result.push(OfferedCourse);
     }
-
-    const OfferedCourse = await prisma.offeredCourse.create({
-      data: {
-        courseId: courseId,
-        semesterRegistrationId: semesterRegistrationId,
-        academicDepartmentId: academicDepartmentId,
-      },
-      include: {
-        course: true,
-        semesterRegistration: true,
-        academicDepartment: true,
-      },
-    });
-
-    result.push(OfferedCourse);
   });
+
+  if (result.length === 0) {
+    throw new ApiError(
+      httpStatus.BAD_REQUEST,
+      'This offered course data is already exist!'
+    );
+  }
 
   return result;
 };

@@ -15,7 +15,10 @@ const handleClientError = (error: PrismaClientKnownRequestError) => {
       },
     ];
   } else if (error.code === 'P2003') {
-    message = `Invalid foreign key! ${error.meta?.field_name}`;
+    const errorFieldName = (error.meta?.field_name as string).split('_');
+    message = `Data not found by foreign key id! ${
+      errorFieldName[errorFieldName.length - 2]
+    }`;
     errorMessages = [
       {
         path: '',
