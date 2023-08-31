@@ -12,9 +12,4 @@ export const OfferedCourseClassScheduleFilterableFields = [
 export const OfferedCourseClassScheduleSearchableFields = [
   'startTime',
   'endTime',
-  'dayOfWeek',
-  'offeredCourseSectionId',
-  'semesterRegistrationId',
-  'roomId',
-  'facultyid',
 ];

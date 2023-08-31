@@ -16,9 +16,7 @@ const handleClientError = (error: PrismaClientKnownRequestError) => {
     ];
   } else if (error.code === 'P2003') {
     const errorFieldName = (error.meta?.field_name as string).split('_');
-    message = `Data not found by ${
-      errorFieldName[errorFieldName.length - 2]
-    }! `;
+    message = `${errorFieldName[errorFieldName.length - 2]} is invalid!`;
     errorMessages = [
       {
         path: '',

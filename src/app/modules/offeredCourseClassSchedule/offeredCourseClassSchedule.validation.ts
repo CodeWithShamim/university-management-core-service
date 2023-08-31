@@ -31,7 +31,7 @@ const create = z.object({
         required_error: 'Room id is required.',
       })
       .nonempty(),
-    facultyid: z
+    facultyId: z
       .string({
         required_error: 'Faculty id is required.',
       })
@@ -49,7 +49,7 @@ const update = z.object({
     offeredCourseSectionId: z.string().optional(),
     semesterRegistrationId: z.string().optional(),
     roomId: z.string().optional(),
-    facultyid: z.string().optional(),
+    facultyId: z.string().optional(),
   }),
 });
 

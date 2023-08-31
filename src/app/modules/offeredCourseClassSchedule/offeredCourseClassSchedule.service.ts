@@ -7,10 +7,14 @@ import handleFilters from '../../../shared/handleFilters';
 import prisma from '../../../shared/prisma';
 import { OfferedCourseClassScheduleSearchableFields } from './offeredCourseClassSchedule.constant';
 import { IFilters } from './offeredCourseClassSchedule.interface';
+import { OfferedCourseClassScheduleUtils } from './offeredCourseClassSchedule.utils';
 
 const createOfferedCourseClassSchedule = async (
   data: OfferedCourseClassSchedule
 ): Promise<OfferedCourseClassSchedule> => {
+  await OfferedCourseClassScheduleUtils.checkRoomAvailable(data);
+  await OfferedCourseClassScheduleUtils.checkFacultyAvailable(data);
+
   const OfferedCourseClassSchedule =
     await prisma.offeredCourseClassSchedule.create({
       data,
