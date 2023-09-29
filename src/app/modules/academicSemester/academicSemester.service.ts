@@ -1,22 +1,43 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AcademicSemester } from '@prisma/client';
+import httpStatus from 'http-status';
+import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IGenericResponse } from '../../../interfaces/common';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import handleFilters from '../../../shared/handleFilters';
 import prisma from '../../../shared/prisma';
-import { AcademicSemesterSearchableFields } from './academicSemester.constant';
+import { RedisClient } from '../../../shared/redis';
+import {
+  AcademicSemesterSearchableFields,
+  EVENT_ACADEMIC_SEMESTER_CREATED,
+  EVENT_ACADEMIC_SEMESTER_UPDATED,
+  academicSemesterTitleCodeMapper,
+} from './academicSemester.constant';
 import { IFilters } from './academicSemester.interface';
 
 const createAcademicSemester = async (
   data: AcademicSemester
 ): Promise<AcademicSemester> => {
+  if (academicSemesterTitleCodeMapper[data.title] !== data.code) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid semester code!');
+  }
+
   const academicSemester = await prisma.academicSemester.create({
     data,
     include: {
       students: true,
     },
   });
+
+  // publish data on redis
+  if (academicSemester) {
+    await RedisClient.publish(
+      EVENT_ACADEMIC_SEMESTER_CREATED,
+      JSON.stringify(academicSemester)
+    );
+  }
+
   return academicSemester;
 };
 
@@ -77,6 +98,14 @@ const updateAcademicSemester = async (
   id: string,
   data: Partial<AcademicSemester>
 ): Promise<AcademicSemester> => {
+  if (
+    data.title &&
+    data.code &&
+    academicSemesterTitleCodeMapper[data.title] !== data.code
+  ) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid semester code!');
+  }
+
   const result = await prisma.academicSemester.update({
     where: {
       id,
@@ -86,6 +115,15 @@ const updateAcademicSemester = async (
       students: true,
     },
   });
+
+  // publish data on redis
+  if (result) {
+    await RedisClient.publish(
+      EVENT_ACADEMIC_SEMESTER_UPDATED,
+      JSON.stringify(result)
+    );
+  }
+
   return result;
 };
 
